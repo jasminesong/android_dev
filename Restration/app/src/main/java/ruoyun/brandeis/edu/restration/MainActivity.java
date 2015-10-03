@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         final EditText editText3 = (EditText) findViewById(R.id.etEmail);
 
 
-
+        // put setOnClickListener within some fuction often onCreate()
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent my_intent = new Intent(MainActivity.this, AfterRegisterActivity.class);
