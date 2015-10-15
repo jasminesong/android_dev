@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,7 +25,13 @@ public class MainActivity extends AppCompatActivity {
 
         if(serviceOk()){
             setContentView(R.layout.activity_map);
-            Toast.makeText(this,"Ready to map!",Toast.LENGTH_LONG).show();
+
+            if(serviceOk()){
+                Toast.makeText(this,"Ready to map!",Toast.LENGTH_LONG).show();
+            }else{
+                Toast.makeText(this,"Map is not connected!",Toast.LENGTH_LONG).show();
+
+            }
 
         }else{
             setContentView(R.layout.activity_main);
@@ -70,5 +77,16 @@ public class MainActivity extends AppCompatActivity {
 
         return false;
 
+    }
+
+    private boolean initMap(){
+        if(mMap == null){
+            //java equivalent to put a fragment tag in xml
+            SupportMapFragment mapFragment =
+                    (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
+            mMap = mapFragment.getMap();
+        }
+
+        return (mMap !=null);
     }
 }
