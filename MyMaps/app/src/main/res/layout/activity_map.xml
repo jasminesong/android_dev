@@ -5,9 +5,9 @@
     android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    map:cameraTargetLat="30.497089"
-    map:cameraTargetLng="114.364183"
-    map:cameraZoom="15"
+
+    map:mapType="hybrid"
+
 
     />
 

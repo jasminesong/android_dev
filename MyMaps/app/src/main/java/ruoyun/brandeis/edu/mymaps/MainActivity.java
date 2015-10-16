@@ -10,12 +10,21 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
 public class MainActivity extends AppCompatActivity {
 
     GoogleMap mMap;
+    private static final double
+            HOME_LAT=30.497089,
+            HOME_LNG=114.364183;
+
+
+
     private static final int ERROR_DIALOG_REQUEST = 9001;
 
     @Override
@@ -26,8 +35,11 @@ public class MainActivity extends AppCompatActivity {
         if(serviceOk()){
             setContentView(R.layout.activity_map);
 
-            if(serviceOk()){
+            if(initMap()){
                 Toast.makeText(this,"Ready to map!",Toast.LENGTH_LONG).show();
+                gotolocation(HOME_LAT,HOME_LNG,17);
+
+
             }else{
                 Toast.makeText(this,"Map is not connected!",Toast.LENGTH_LONG).show();
 
@@ -88,5 +100,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return (mMap !=null);
+    }
+
+    private void gotolocation(double lat,double lng,float zoom){
+        LatLng latLng = new LatLng(lat,lng);
+        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(latLng,zoom);
+        mMap.moveCamera(update);
+
     }
 }
