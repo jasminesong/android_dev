@@ -1,6 +1,7 @@
 package ruoyun.brandeis.edu.mymaps;
 
 import android.app.Dialog;
+import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telecom.ConnectionRequest;
@@ -10,22 +11,25 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener
 
+{
+    private static final int ERROR_DIALOG_REQUEST = 9001;
     GoogleMap mMap;
     private static final double
             HOME_LAT=30.497089,
             HOME_LNG=114.364183;
+    private GoogleApiClient mLocationClient;
 
-
-
-    private static final int ERROR_DIALOG_REQUEST = 9001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +40,16 @@ public class MainActivity extends AppCompatActivity {
             setContentView(R.layout.activity_map);
 
             if(initMap()){
-                Toast.makeText(this,"Ready to map!",Toast.LENGTH_LONG).show();
-                gotolocation(HOME_LAT,HOME_LNG,17);
+                //Toast.makeText(this,"Ready to map!",Toast.LENGTH_LONG).show();
+                gotolocation(HOME_LAT, HOME_LNG, 17);
 
+                mLocationClient = new GoogleApiClient.Builder(this)
+                        .addApi(LocationServices.API)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .build();      //create client object
+
+                mLocationClient.connect();
 
             }else{
                 Toast.makeText(this,"Map is not connected!",Toast.LENGTH_LONG).show();
@@ -125,5 +136,40 @@ public class MainActivity extends AppCompatActivity {
         CameraUpdate update = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
         mMap.moveCamera(update);
 
+    }
+
+
+    public void showCurrentLocation(MenuItem item){
+        Location currentLocation = LocationServices.FusedLocationApi
+                .getLastLocation(mLocationClient);
+        if(currentLocation == null){
+            Toast.makeText(this,"Couldn't connect",Toast.LENGTH_SHORT).show();
+        }else{
+            LatLng latLng = new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude());
+            CameraUpdate update =CameraUpdateFactory.newLatLngZoom(latLng,15);
+            mMap.animateCamera(update);
+        }
+
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Toast.makeText(this,"Ready to map!!!",Toast.LENGTH_LONG).show();//only see this msg if only connected to Google location services
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mLocationClient.connect();
     }
 }
