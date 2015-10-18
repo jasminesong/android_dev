@@ -74,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 //Toast.makeText(this,"Ready to map!",Toast.LENGTH_LONG).show();
                 gotolocation(HOME_LAT, HOME_LNG, 17);
 
+                //mMap.setMyLocationEnabled(true);
+
                 mLocationClient = new GoogleApiClient.Builder(this)
                         .addApi(LocationServices.API)
                         .addConnectionCallbacks(this)
