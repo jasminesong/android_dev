@@ -46,15 +46,28 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        //setContentView(R.layout.activity_main);
 
-        EditText yourEditText = (EditText) findViewById(R.id.editText1);
 
 
 
 
         if(serviceOk()){
             setContentView(R.layout.activity_map);
+
+
+            final EditText et = (EditText) findViewById(R.id.editText1);
+            et.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //EditText yourEditText= (EditText) findViewById(R.id.editText1);
+                    //yourEditText.requestFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT);
+                }
+            });
+
+
 
             //showKeyboard();
             if(initMap()){
@@ -192,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
     public void geoLocate(View v) throws IOException {
-        //hideSoftKeyboard(v);
+        hideSoftKeyboard(v);
 
         Toast.makeText(this,"geolocate!!!",Toast.LENGTH_LONG).show();
         //showKeyboard();
