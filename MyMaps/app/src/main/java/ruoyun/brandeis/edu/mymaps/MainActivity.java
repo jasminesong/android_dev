@@ -1,12 +1,21 @@
 package ruoyun.brandeis.edu.mymaps;
 
 import android.app.Dialog;
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telecom.ConnectionRequest;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnFocusChangeListener;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -18,6 +27,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+
+import java.io.IOException;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener
@@ -36,9 +48,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        EditText yourEditText = (EditText) findViewById(R.id.editText1);
+
+
+
+
         if(serviceOk()){
             setContentView(R.layout.activity_map);
 
+            //showKeyboard();
             if(initMap()){
                 //Toast.makeText(this,"Ready to map!",Toast.LENGTH_LONG).show();
                 gotolocation(HOME_LAT, HOME_LNG, 17);
@@ -135,7 +153,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         LatLng latLng = new LatLng(lat,lng);
         CameraUpdate update = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
         mMap.moveCamera(update);
-
     }
 
 
@@ -167,9 +184,53 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mLocationClient.connect();
+    //@Override
+//    protected void onResume() {
+//        super.onResume();
+//        mLocationClient.connect();
+//    }
+
+
+    public void geoLocate(View v) throws IOException {
+        //hideSoftKeyboard(v);
+
+        Toast.makeText(this,"geolocate!!!",Toast.LENGTH_LONG).show();
+        //showKeyboard();
+
+        TextView tv =(TextView) findViewById(R.id.editText1);
+        String searchString = tv.getText().toString();
+
+        Geocoder gc = new Geocoder(this);
+        List<Address> list =gc.getFromLocationName(searchString,1);
+
+        if(list.size()>0){
+            Address add =list.get(0);
+            String locality = add.getLocality();
+            Toast.makeText(this,"Found:" + locality, Toast.LENGTH_SHORT).show();
+
+            double lat = add.getLatitude();
+            double lng = add.getLongitude();
+            gotolocation(lat,lng,15);
+
+        }
     }
+
+    private void hideSoftKeyboard(View v) {
+        InputMethodManager imm =(InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+    }
+
+    public void showKeyboard(){
+        //Toast.makeText(this,"hello",Toast.LENGTH_SHORT).show();
+
+        EditText yourEditText= (EditText) findViewById(R.id.editText1);
+        //yourEditText.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(yourEditText, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+
+
+
+
 }
