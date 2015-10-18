@@ -26,7 +26,9 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private GoogleApiClient mLocationClient;//previous class named LocationApi has been solidated
                                             // into GoogleApiClient class
 
+    private Marker marker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -231,10 +234,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             gotolocation(lat,lng,15);
 
             //add marker
+
+            if(marker != null){
+                marker.remove();
+            }
             MarkerOptions options = new MarkerOptions()
                     .title(locality)
-                    .position(new LatLng(lat,lng));
-            mMap.addMarker(options);
+                    .position(new LatLng(lat,lng))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_top_car_picture_color));
+            marker = mMap.addMarker(options);
 
         }
     }
