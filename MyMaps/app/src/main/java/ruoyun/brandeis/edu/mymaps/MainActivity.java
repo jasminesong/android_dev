@@ -27,6 +27,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.util.List;
@@ -228,6 +229,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             double lat = add.getLatitude();
             double lng = add.getLongitude();
             gotolocation(lat,lng,15);
+
+            //add marker
+            MarkerOptions options = new MarkerOptions()
+                    .title(locality)
+                    .position(new LatLng(lat,lng));
+            mMap.addMarker(options);
 
         }
     }
