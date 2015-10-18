@@ -40,7 +40,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private static final double
             HOME_LAT=30.497089,
             HOME_LNG=114.364183;
-    private GoogleApiClient mLocationClient;
+
+    private GoogleApiClient mLocationClient;//previous class named LocationApi has been solidated
+                                            // into GoogleApiClient class
 
 
     @Override
@@ -186,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(Bundle bundle) {
-        Toast.makeText(this,"Ready to map!!!",Toast.LENGTH_LONG).show();//only see this msg if only connected to Google location services
+        Toast.makeText(this,"Ready to map!",Toast.LENGTH_LONG).show();//only see this msg if only connected to Google location services
     }
 
     @Override
