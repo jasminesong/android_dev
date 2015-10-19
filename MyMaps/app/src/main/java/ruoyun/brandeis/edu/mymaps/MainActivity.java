@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             //showKeyboard();
             if(initMap()){
                 //Toast.makeText(this,"Ready to map!",Toast.LENGTH_LONG).show();
-                gotolocation(HOME_LAT, HOME_LNG, 17);
+                gotolocation(HOME_LAT, HOME_LNG, 15);
 
                 //mMap.setMyLocationEnabled(true);
 
@@ -165,9 +165,39 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             SupportMapFragment mapFragment =
                     (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
             mMap = mapFragment.getMap();
+
+            if(mMap!=null){
+                mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                    @Override
+                    public void onMapLongClick(LatLng latLng) {
+                        Geocoder gc = new Geocoder(MainActivity.this);
+                        List<Address> list = null;
+
+                        try {
+                            list=gc.getFromLocation(latLng.latitude,latLng.longitude,1);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            return;
+                        }
+
+                        Address add = list.get(0);
+                        MainActivity.this.addMarker(add,latLng.latitude,latLng.longitude);
+                    }
+                });
+            }
         }
 
         return (mMap !=null);
+    }
+
+    private void addMarker(Address add, double latitude, double longitude) {
+        MarkerOptions options = new MarkerOptions()
+
+                .position(new LatLng(latitude, longitude))
+                .draggable(true)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_top_car_picture_color));
+        marker = mMap.addMarker(options);
+
     }
 
     private void gotolocation(double lat,double lng,float zoom){
@@ -186,7 +216,21 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             LatLng latLng = new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude());
             CameraUpdate update =CameraUpdateFactory.newLatLngZoom(latLng,15);
             mMap.animateCamera(update);
+
+            //add marker
+
+            if(marker != null){
+                marker.remove();
+            }
+            MarkerOptions options = new MarkerOptions()
+
+                    .position(latLng)
+                    .draggable(true)
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_top_car_picture_color));
+            marker = mMap.addMarker(options);
         }
+
+
 
     }
 
@@ -241,6 +285,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             MarkerOptions options = new MarkerOptions()
                     .title(locality)
                     .position(new LatLng(lat,lng))
+                    .draggable(true)
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_top_car_picture_color));
             marker = mMap.addMarker(options);
 
