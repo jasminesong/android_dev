@@ -43,8 +43,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private static final int ERROR_DIALOG_REQUEST = 9001;
     GoogleMap mMap;
     private static final double
-            HOME_LAT = 30.497089,
-            HOME_LNG = 114.364183;
+            HOME_LAT=30.497089,
+                 HOME_LNG=114.364183;
+
 
     private GoogleApiClient mLocationClient;//previous class named LocationApi has been solidated
     // into GoogleApiClient class
@@ -76,8 +77,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             //showKeyboard();
             if (initMap()) {
                 //Toast.makeText(this,"Ready to map!",Toast.LENGTH_LONG).show();
-                gotolocation(HOME_LAT, HOME_LNG, 15);
                 //mMap.setMyLocationEnabled(true);
+                gotolocation(HOME_LAT, HOME_LNG, 15);
 
                 mLocationClient = new GoogleApiClient.Builder(this)
                         .addApi(LocationServices.API)
@@ -88,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 mLocationClient.connect();
                 //showCurrentLocation();
                 //getCurrentLocation();
+
+
 
             } else {
                 Toast.makeText(this, "Map is not connected!", Toast.LENGTH_LONG).show();
