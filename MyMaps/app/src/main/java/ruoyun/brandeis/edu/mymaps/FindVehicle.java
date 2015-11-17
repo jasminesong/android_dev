@@ -3,14 +3,18 @@ package ruoyun.brandeis.edu.mymaps;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Location;
+import android.location.LocationManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -20,9 +24,10 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.vision.barcode.Barcode;
 
 public class FindVehicle extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
 
     GoogleMap mMap;
@@ -30,13 +35,16 @@ public class FindVehicle extends AppCompatActivity implements GoogleApiClient.Co
     Marker vehicle_marker;
     private GoogleApiClient mLocationClient;
     LatLng latLng;
+    private LocationRequest mLocationRequest;
+    private LocationManager mLocationManager;
+    int toastID = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find_vehicle);
 
-        Intent my_intent=getIntent();
+        Intent my_intent = getIntent();
         latLng = new LatLng(my_intent.getDoubleExtra("marker_latitude", 0.0),
                 my_intent.getDoubleExtra("marker_longtitude", 0.0));
 
@@ -62,6 +70,15 @@ public class FindVehicle extends AppCompatActivity implements GoogleApiClient.Co
             //addClientMarker(latLngClient);
 
         }
+
+        // Create the LocationRequest object
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(1 * 1000)        // 10 seconds, in milliseconds
+                .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+
+
+        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
 
     }
@@ -95,26 +112,55 @@ public class FindVehicle extends AppCompatActivity implements GoogleApiClient.Co
     }
 
     @Override
-  public void onConnected(Bundle bundle) {
-       //Toast.makeText(this, "Ready to find vehicle!", Toast.LENGTH_LONG).show();
+    public void onConnected(Bundle bundle) {
+        //Toast.makeText(this, "Ready to find vehicle!", Toast.LENGTH_LONG).show();
         Location currentLocation = LocationServices.FusedLocationApi
                 .getLastLocation(mLocationClient);
 
         LatLng latLngClient = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-       //LatLng latLngClient = new LatLng(0.0,0.0);
+        //LatLng latLngClient = new LatLng(0.0,0.0);
         addClientMarker(latLngClient);
         addVehicleMarker(latLng);
 
         LatLng cameraLatLng = new LatLng(0.5 * (latLng.latitude + latLngClient.latitude),
-               0.5 * (latLng.longitude + latLngClient.longitude));
+                0.5 * (latLng.longitude + latLngClient.longitude));
         Toast.makeText(this, "mLocationClient is connected!", Toast.LENGTH_LONG).show();
 
-       //gotolocation(cameraLatLng,18);
-       gotolocation(cameraLatLng, 16);
-        Toast.makeText(this, "mLocationClient is connected!"+latLngClient+"----"+cameraLatLng, Toast.LENGTH_LONG).show();
+        //gotolocation(cameraLatLng,18);
+        gotolocation(cameraLatLng, 16);
+        Toast.makeText(this, "mLocationClient is connected!" + latLngClient + "----" + cameraLatLng, Toast.LENGTH_LONG).show();
 
         //addVehicleMarker(latLng);
-   }
+
+
+
+
+
+        Location location = LocationServices.FusedLocationApi.getLastLocation(mLocationClient);
+        if (location == null) {
+            Toast.makeText(this,"Location null!",Toast.LENGTH_LONG).show();
+
+            //LocationServices.FusedLocationApi.requestLocationUpdates(mLocationClient, mLocationRequest, this);
+        } else {
+            Toast.makeText(this,"Location not null!",Toast.LENGTH_LONG).show();
+
+            // Register the listener with the Location Manager to receive location updates
+            LocationServices.FusedLocationApi.requestLocationUpdates(mLocationClient, mLocationRequest, this);
+
+            handleNewLocation(location);
+        }
+    }
+
+    private void handleNewLocation(Location location) {
+        Toast.makeText(this,"handle New!"+ this.toastID++,Toast.LENGTH_LONG).show();
+
+
+        double currentLatitude = location.getLatitude();
+        double currentLongitude = location.getLongitude();
+        LatLng latLng = new LatLng(currentLatitude, currentLongitude);
+
+        addClientMarker(latLng);
+    }
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -139,7 +185,7 @@ public class FindVehicle extends AppCompatActivity implements GoogleApiClient.Co
 
     }
 
-    private void addClientMarker(LatLng latLng){
+    private void addClientMarker(LatLng latLng) {
         MarkerOptions options = new MarkerOptions()
 
                 .position(latLng)
@@ -150,4 +196,16 @@ public class FindVehicle extends AppCompatActivity implements GoogleApiClient.Co
         }
         client_marker = mMap.addMarker(options);
     }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Toast.makeText(this,"Location changed!" + this.toastID++,Toast.LENGTH_LONG).show();
+
+        handleNewLocation(location);
+
+    }
+
+
 }
+
+

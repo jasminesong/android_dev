@@ -6,14 +6,11 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.telecom.ConnectionRequest;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnFocusChangeListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,6 +29,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import android.database.sqlite.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -44,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     GoogleMap mMap;
     private static final double
             HOME_LAT=30.497089,
-                 HOME_LNG=114.364183;
+            HOME_LNG=114.364183;
 
 
     private GoogleApiClient mLocationClient;//previous class named LocationApi has been solidated
@@ -78,7 +76,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             if (initMap()) {
                 //Toast.makeText(this,"Ready to map!",Toast.LENGTH_LONG).show();
                 //mMap.setMyLocationEnabled(true);
-                gotolocation(HOME_LAT, HOME_LNG, 15);
+
+                //gotolocation(HOME_LAT,HOME_LNG,16);
+
 
                 mLocationClient = new GoogleApiClient.Builder(this)
                         .addApi(LocationServices.API)
@@ -89,6 +89,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 mLocationClient.connect();
                 //showCurrentLocation();
                 //getCurrentLocation();
+
+//                Location currentLocation = LocationServices.FusedLocationApi
+//                        .getLastLocation(mLocationClient);
+//
+//                LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+//
+//                addVehicleMarker(latLng);
+//                gotolocation(latLng.latitude,latLng.longitude,16);
+
+              //
 
 
 
@@ -110,8 +120,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     LatLng latLng = marker.getPosition();
                     Intent my_intent = new Intent(MainActivity.this,FindVehicle.class);
                     my_intent.putExtra("marker_latitude",latLng.latitude);
-                    my_intent.putExtra("marker_longtitude",latLng.longitude);
+                    my_intent.putExtra("marker_longtitude", latLng.longitude);
                     startActivity(my_intent);
+
+                    MySqliteHelper db = new MySqliteHelper(MainActivity.this);
+                    db.addLocation(latLng);
 
                 }else{
                     Toast.makeText(MainActivity.this,"Please long touch the map to place your car",
@@ -293,7 +306,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onConnected(Bundle bundle) {
         Toast.makeText(this, "Ready to map!", Toast.LENGTH_LONG).show();//only see this msg if only connected to Google location services
+        startPage();
+
     }
+
+
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -377,7 +394,32 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     }
 
+    private void addVehicleMarker(LatLng latLng) {
+        MarkerOptions options = new MarkerOptions()
+
+                .position(latLng)
+                .draggable(true)
+                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher));
+        if (marker != null) {
+            marker.remove();
+        }
+        marker = mMap.addMarker(options);
+
+    }
 
 
+    public void startPage(){
+        Location currentLocation = LocationServices.FusedLocationApi
+                .getLastLocation(mLocationClient);
+
+        LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+
+        addVehicleMarker(latLng);
+
+        gotolocation(latLng.latitude,latLng.longitude, 16);
+
+
+
+    }
 
 }
